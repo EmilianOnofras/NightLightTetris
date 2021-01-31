@@ -7,9 +7,8 @@ public class TableBehaviour
 {
    public delegate void roundDelegate();
    public static event roundDelegate newRoundEvent;
-
-   public delegate void pointSystem();
    private GameObject[] newTable;
+   pointManager pointSystem;
    
    public int[,] boardLogic {get; protected set;} = new int[24,10];
 
@@ -95,13 +94,15 @@ public class TableBehaviour
             rowsfreed++;
          }
       }
+      pointSystem.pointsAquired(rowsfreed);
       newRoundEvent.Invoke();
       refreshVisualBoardProjection();      
    }
 
    //initializes the array with in-game assets
-   public TableBehaviour(GameObject[] Blocks){
+   public TableBehaviour(GameObject[] Blocks,pointManager points){
       newTable = Blocks;
+      pointSystem = points;
    }
 
    public bool validMove(int[,] newPosition){

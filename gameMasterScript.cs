@@ -3,19 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class gameMasterScript : MonoBehaviour
 {
     public GameObject[] uiBlocks = new GameObject[240]; 
     TableBehaviour tableSystem ;
-    Tetromino currentPiece;
     tetrominoAdministrator tetAdmn;
+    Tetromino currentPiece;
     Dictionary<char,int[][,]> RotationLibrary;
+    public Text score;
+
+    private pointManager pointSystem;
 
     void Start()
     {
-        tableSystem = new TableBehaviour(uiBlocks);
+        pointSystem = new pointManager(score);
+        tableSystem = new TableBehaviour(uiBlocks,pointSystem);
         tetAdmn = new tetrominoAdministrator();
+
         RotationLibrary = tetAdmn.getRotationLibrary();
         generateNewPiece();
         tableSystem.refreshPosition(currentPiece.getPieceLocation());
