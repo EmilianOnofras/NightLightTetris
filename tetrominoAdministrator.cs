@@ -147,10 +147,10 @@ public class tetrominoAdministrator {
 
     void initializeTetrominoList(){
         allTetrominos.Add('T',new int[,]{{4,5},{5,5},{5,4},{5,6}});
-        allTetrominos.Add('L',new int[,]{{4,5},{5,5},{6,5},{6,6}});
-        allTetrominos.Add('J',new int[,]{{5,4},{5,5},{5,6},{6,6}});
-        allTetrominos.Add('S',new int[,]{{4,5},{5,5},{5,6},{6,6}});
-        allTetrominos.Add('Z',new int[,]{{5,4},{5,5},{6,5},{6,6}});
+        allTetrominos.Add('L',new int[,]{{5,4},{5,5},{5,6},{4,6}});
+        allTetrominos.Add('J',new int[,]{{4,4},{5,5},{5,4},{5,6}});
+        allTetrominos.Add('S',new int[,]{{5,4},{5,5},{4,5},{4,6}});
+        allTetrominos.Add('Z',new int[,]{{5,6},{5,5},{4,4},{4,5}});
         allTetrominos.Add('O',new int[,]{{5,6},{5,5},{6,5},{6,6}});
         allTetrominos.Add('I',new int[,]{{5,4},{5,5},{5,6},{5,7}});
     }

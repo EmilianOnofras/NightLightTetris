@@ -25,10 +25,10 @@ public class tetrominoPreview
 
     void initializeDictionary(){
         letterValueTable.Add('T',new int[,]{{0,1},{1,1},{1,0},{1,2}});
-        letterValueTable.Add('L',new int[,]{{0,1},{1,1},{2,1},{2,2}});
-        letterValueTable.Add('J',new int[,]{{1,0},{1,1},{1,2},{2,2}});
-        letterValueTable.Add('S',new int[,]{{0,1},{1,1},{1,2},{2,2}});
-        letterValueTable.Add('Z',new int[,]{{1,0},{1,1},{2,1},{2,2}});
+        letterValueTable.Add('L',new int[,]{{1,0},{1,1},{1,2},{0,2}});
+        letterValueTable.Add('J',new int[,]{{0,0},{1,1},{1,0},{1,2}});
+        letterValueTable.Add('S',new int[,]{{1,0},{1,1},{0,1},{0,2}});
+        letterValueTable.Add('Z',new int[,]{{1,2},{1,1},{0,0},{0,1}});
         letterValueTable.Add('O',new int[,]{{1,2},{1,1},{2,1},{2,2}});
         letterValueTable.Add('I',new int[,]{{1,0},{1,1},{1,2},{1,3}});
     }
