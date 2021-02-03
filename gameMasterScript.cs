@@ -7,9 +7,14 @@ using UnityEngine.UI;
 
 public class gameMasterScript : MonoBehaviour
 {
-    public GameObject[] uiBlocks = new GameObject[240]; 
+    public GameObject[] uiBlocks = new GameObject[240];
+    public GameObject[] previewTableOne = new GameObject[16]; 
+    public GameObject[] previewTableTwo = new GameObject[16]; 
+    public GameObject[] previewTableThree = new GameObject[16];  
     TableBehaviour tableSystem ;
-    tetrominoAdministrator tetAdmn;
+    tetrominoAdministrator tetAdmin;
+
+    tetrominoPreview previewTable;
     Tetromino currentPiece;
     Dictionary<char,int[][,]> RotationLibrary;
     public Text score;
@@ -20,9 +25,11 @@ public class gameMasterScript : MonoBehaviour
     {
         pointSystem = new pointManager(score);
         tableSystem = new TableBehaviour(uiBlocks,pointSystem);
-        tetAdmn = new tetrominoAdministrator();
+        previewTable = new tetrominoPreview(previewTableOne,previewTableTwo,previewTableThree);  
+        tetAdmin = new tetrominoAdministrator(previewTable);
+      
 
-        RotationLibrary = tetAdmn.getRotationLibrary();
+        RotationLibrary = tetAdmin.getRotationLibrary();
         generateNewPiece();
         tableSystem.refreshPosition(currentPiece.getPieceLocation());
 
@@ -31,7 +38,7 @@ public class gameMasterScript : MonoBehaviour
     }
 
     public void generateNewPiece(){
-        currentPiece = tetAdmn.newPiece();
+        currentPiece = tetAdmin.newPiece();
         if(tableSystem.validMove(currentPiece.getPieceLocation())){
             tableSystem.newPiecePosition(currentPiece.getPieceLocation());
         }else{
@@ -118,8 +125,10 @@ public class gameMasterScript : MonoBehaviour
     }
 
     public void fastDown(InputAction.CallbackContext context){
-        while(tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())){
-            moveDownAuto();
+        if(context.performed){
+            while(tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())){
+                moveDownAuto();
+            }
         }
     }
 

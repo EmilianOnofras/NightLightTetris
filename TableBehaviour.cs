@@ -30,14 +30,13 @@ public class TableBehaviour
    }
 
    private void refreshLogicPosition(int a){
-      //Debug.Log(currentTetrominoPosition[0,0]+" "+currentTetrominoPosition[0,1]+"  "+currentTetrominoPosition[1,0]+" "+currentTetrominoPosition[1,1]+"  "+currentTetrominoPosition[2,0]+" "+currentTetrominoPosition[2,1]+"  "+currentTetrominoPosition[3,0]+" "+currentTetrominoPosition[3,1]);
       for(int i=0;i<currentTetrominoPosition.GetLength(0);i++){
          boardLogic[currentTetrominoPosition[i,0],currentTetrominoPosition[i,1]]=a;
       }
    }
 
    // updates the ui of the entire board
-   private void refreshVisualBoardProjection(){
+   void refreshVisualBoardProjection(){
       for(int i=0;i<boardLogic.GetLength(0);i++){
            for(int j=0;j<boardLogic.GetLength(1);j++){
               if(boardLogic[i,j]!=0){

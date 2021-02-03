@@ -5,6 +5,9 @@ using UnityEngine;
 public class tetrominoAdministrator {
 
     System.Random rnd = new System.Random();
+
+    tetrominoPreview previewTable;
+    Queue<char> nextPiece = new Queue<char>();
     
     //Contains a letter to identify piece, an array coressponding to a rotation state 
     //and a matrix containing values that added to the coordinates of a piece will cicle said piece through it's rotations
@@ -167,18 +170,32 @@ public class tetrominoAdministrator {
         }
     }
 
-    public Tetromino newPiece(){
-        int a = rnd.Next(0,randomPickHelper.Count);
-        return new Tetromino(randomPickHelper[a],RotationLibrary[randomPickHelper[a]],allTetrominos[randomPickHelper[a]]);              
+    public Tetromino newPiece()
+    {
+        char currentLetter = nextPiece.Dequeue();
+        char temp = randomPickHelper[rnd.Next(0, randomPickHelper.Count)];
+        previewTable.nextRound(temp);
+        nextPiece.Enqueue(temp);
+        return new Tetromino(currentLetter, RotationLibrary[currentLetter], allTetrominos[currentLetter]);
     }
 
     public Dictionary<char,int[][,]> getRotationLibrary(){
         return RotationLibrary;
     }
     
-    public tetrominoAdministrator(){
+    public tetrominoAdministrator(tetrominoPreview tablePreview){
+        previewTable=tablePreview;
+
         initializeTetrominoList();
         initializeRotationLibrary();
         initializeRandomPickHelper();
+
+        char temp;
+        
+        for(int i=0;i<3;i++){
+            temp = randomPickHelper[rnd.Next(0,randomPickHelper.Count)];
+            previewTable.nextRound(temp);
+            nextPiece.Enqueue(temp);
+        }
     }
 }
