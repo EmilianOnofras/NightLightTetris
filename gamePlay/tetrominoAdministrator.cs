@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class tetrominoAdministrator {
@@ -174,6 +173,7 @@ public class tetrominoAdministrator {
     {
         char currentLetter = nextPiece.Dequeue();
         char temp = randomPickHelper[rnd.Next(0, randomPickHelper.Count)];
+        Debug.Log(temp);
         previewTable.nextRound(temp);
         nextPiece.Enqueue(temp);
         return new Tetromino(currentLetter, RotationLibrary[currentLetter], allTetrominos[currentLetter]);

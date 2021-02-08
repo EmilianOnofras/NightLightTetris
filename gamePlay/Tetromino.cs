@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Tetromino
+﻿public class Tetromino
 {
     public static readonly  int[,,] superRotation = new int[,,] {{{0,0},{-1,0},{-1,1},{0,-2},{-1,-2}},
                                                 {{0,0},{1,0},{1,-1},{0,2},{1,2}},

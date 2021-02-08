@@ -116,6 +116,33 @@ public class @InputMap : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UI"",
+            ""id"": ""103e05fa-0478-4c15-a5ef-ff19219a8fab"",
+            ""actions"": [
+                {
+                    ""name"": ""doNothing"",
+                    ""type"": ""Button"",
+                    ""id"": ""7a3989dd-16fb-42eb-b449-df2c708d6009"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""ceb7acb7-6c53-4468-8e57-fcbe96d97cbc"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""doNothing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -188,6 +215,9 @@ public class @InputMap : IInputActionCollection, IDisposable
         m_Player_RotateForward = m_Player.FindAction("RotateForward", throwIfNotFound: true);
         m_Player_moveDown = m_Player.FindAction("moveDown", throwIfNotFound: true);
         m_Player_fastDown = m_Player.FindAction("fastDown", throwIfNotFound: true);
+        // UI
+        m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
+        m_UI_doNothing = m_UI.FindAction("doNothing", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -298,6 +328,39 @@ public class @InputMap : IInputActionCollection, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // UI
+    private readonly InputActionMap m_UI;
+    private IUIActions m_UIActionsCallbackInterface;
+    private readonly InputAction m_UI_doNothing;
+    public struct UIActions
+    {
+        private @InputMap m_Wrapper;
+        public UIActions(@InputMap wrapper) { m_Wrapper = wrapper; }
+        public InputAction @doNothing => m_Wrapper.m_UI_doNothing;
+        public InputActionMap Get() { return m_Wrapper.m_UI; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
+        public void SetCallbacks(IUIActions instance)
+        {
+            if (m_Wrapper.m_UIActionsCallbackInterface != null)
+            {
+                @doNothing.started -= m_Wrapper.m_UIActionsCallbackInterface.OnDoNothing;
+                @doNothing.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnDoNothing;
+                @doNothing.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnDoNothing;
+            }
+            m_Wrapper.m_UIActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @doNothing.started += instance.OnDoNothing;
+                @doNothing.performed += instance.OnDoNothing;
+                @doNothing.canceled += instance.OnDoNothing;
+            }
+        }
+    }
+    public UIActions @UI => new UIActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -350,5 +413,9 @@ public class @InputMap : IInputActionCollection, IDisposable
         void OnRotateForward(InputAction.CallbackContext context);
         void OnMoveDown(InputAction.CallbackContext context);
         void OnFastDown(InputAction.CallbackContext context);
+    }
+    public interface IUIActions
+    {
+        void OnDoNothing(InputAction.CallbackContext context);
     }
 }

@@ -14,21 +14,24 @@ public class gameMasterScript : MonoBehaviour
     TableBehaviour tableSystem ;
     tetrominoAdministrator tetAdmin;
 
+    public GameObject ScorePanel;
+
     tetrominoPreview previewTable;
     Tetromino currentPiece;
     Dictionary<char,int[][,]> RotationLibrary;
     public Text score;
 
+    public PlayerInput player_Input;
+
     private pointManager pointSystem;
 
-    void Start()
+    public void startGame()
     {
         pointSystem = new pointManager(score);
         tableSystem = new TableBehaviour(uiBlocks,pointSystem);
         previewTable = new tetrominoPreview(previewTableOne,previewTableTwo,previewTableThree);  
         tetAdmin = new tetrominoAdministrator(previewTable);
       
-
         RotationLibrary = tetAdmin.getRotationLibrary();
         generateNewPiece();
         tableSystem.refreshPosition(currentPiece.getPieceLocation());
@@ -37,20 +40,28 @@ public class gameMasterScript : MonoBehaviour
         InvokeRepeating("moveDownAuto",0f,0.85f);
     }
 
+    public void pauseGame(){
+        player_Input.SwitchCurrentActionMap("UI"); 
+        CancelInvoke();
+    }
+
+    public void resumeGame(){
+        player_Input.SwitchCurrentActionMap("Player");
+        InvokeRepeating("moveDownAuto",0f,0.85f);
+    }
+
     public void generateNewPiece(){
         currentPiece = tetAdmin.newPiece();
         if(tableSystem.validMove(currentPiece.getPieceLocation())){
             tableSystem.newPiecePosition(currentPiece.getPieceLocation());
         }else{
-            SceneManager.LoadScene("thisIsTheEnd");
+            ScorePanel.SetActive(true);
+            ScorePanel.GetComponent<scoreBoard>().gameIsDone();
+            player_Input.SwitchCurrentActionMap("UI"); 
             Debug.Log("U did good");
+            CancelInvoke();
         }
 
-    }
-
-    void Update()
-    {
-        
     }
 
     public void moveLeft(InputAction.CallbackContext context){
