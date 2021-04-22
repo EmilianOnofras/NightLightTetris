@@ -7,9 +7,11 @@ public class startPanel : MonoBehaviour
     public Button startButton;
     public Button resumeButton;
     public Button restartButton;
+    public Button goToScore;
 
     public GameObject gMaster;
     public GameObject thisPanel;
+    public GameObject scorePanel;
     
     public void gamePaused(){
         startButton.interactable=false;
@@ -18,13 +20,13 @@ public class startPanel : MonoBehaviour
     }
 
     public void gameFinished(){
-        startButton.interactable=true;
-        resumeButton.interactable=false;
-        restartButton.interactable=false;
+            thisPanel.SetActive(true);
+            startButton.interactable=true;
+            resumeButton.interactable=false;
+            restartButton.interactable=false;
     }
 
-    public void startGame(){ // i probably can expect a function that restarts the scene to work right
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    public void startGame(){
         thisPanel.SetActive(false);
         gMaster.GetComponent<gameMasterScript>().startGame();
     }
@@ -35,9 +37,17 @@ public class startPanel : MonoBehaviour
     }
 
     public void restartGame(){
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        gMaster.GetComponent<gameMasterScript>().restartGame();
         thisPanel.SetActive(false);
-        gMaster.GetComponent<gameMasterScript>().startGame();
+    }
+
+    public void showScore(){
+        thisPanel.SetActive(false);
+        scorePanel.SetActive(true);
+    }
+
+    public void showMenu(){
+        thisPanel.SetActive(true);
     }
 
     public void Quit(){

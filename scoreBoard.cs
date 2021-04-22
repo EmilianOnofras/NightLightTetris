@@ -9,8 +9,11 @@ public class scoreBoard : MonoBehaviour
     public Text firstHighScoreName,secondHighScoreName,thirdHighScoreName,fourthHighScoreName,fifthHighScoreName;
     public Text firstHighScoreValue,secondHighScoreValue,thirdHighScoreValue,fourthHighScoreValue,fifthHighScoreValue;
     public Text finalCurrentScore;
+    int finalScore;
     public GameObject Disclaimer;
     public GameObject inputPanel;
+    public GameObject thisScorePanel;
+    public GameObject startPanel;
 
     public InputField newName;
     public Button finalizeNewAddition;
@@ -40,31 +43,38 @@ public class scoreBoard : MonoBehaviour
     }
 
     public void gameIsDone(){
-        if(int.Parse(finalCurrentScore.text) < int.Parse(finalCurrentScore.text)){
-            inputPanel.SetActive(false);
+        finalScore = int.Parse(finalCurrentScore.text);
+        if(finalScore > PlayerPrefs.GetInt("highScoreFiveValue",0)){
+            startPanel.GetComponent<startPanel>().gameFinished();
+            inputPanel.SetActive(true);
         }
     }
 
     public void addCurrentValues(){
         bool validName=true;
 
-        foreach(var a in newHierarchy){
-            if(newName.text==a.Key){
+        string playerName = newName.text;
+
+        foreach(var a in newHierarchy)
+        {
+            if(playerName==a.Key){
+
                 Disclaimer.SetActive(true);
+                
                 validName=false;
             }
         }
 
         if(validName){
-            newHierarchy.Add(newName.text,int.Parse(finalCurrentScore.text));
+            newHierarchy.Add(playerName,finalScore);
+            
             inputPanel.SetActive(false);
             
             //these should not be here but it respects the execution order
             var sortedDictionary = from entry in newHierarchy orderby entry.Value descending select entry;
+
             setNewScoreBoard(sortedDictionary);
         }
-
-
     }
 
     void setNewScoreBoard(IOrderedEnumerable<KeyValuePair<string,int>> orderedResults){
@@ -86,8 +96,6 @@ public class scoreBoard : MonoBehaviour
                 fifthHighScoreName.text=orderedResults.ElementAt(4).Key;
                 fifthHighScoreValue.text=orderedResults.ElementAt(4).Value.ToString();
         }
-
-        Debug.Log("It happened after this");
         
         PlayerPrefs.SetString("highScoreOneName",firstHighScoreName.text);
         PlayerPrefs.SetString("highScoreTwoName",secondHighScoreName.text);
@@ -100,6 +108,14 @@ public class scoreBoard : MonoBehaviour
         PlayerPrefs.SetInt("highScoreThreeValue",int.Parse(thirdHighScoreValue.text));
         PlayerPrefs.SetInt("highScoreFourValue",int.Parse(fourthHighScoreValue.text));
         PlayerPrefs.SetInt("highScoreFiveValue",int.Parse(fifthHighScoreValue.text));
+    }
+
+    public void exitScore(){
+        thisScorePanel.SetActive(false);
+    }
+
+    public void hideInput(){
+        inputPanel.SetActive(false);
     }
 
 }

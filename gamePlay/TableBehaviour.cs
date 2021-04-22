@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 public class TableBehaviour
 {
@@ -33,7 +34,7 @@ public class TableBehaviour
    }
 
    // updates the ui of the entire board
-   void refreshVisualBoardProjection(){
+   public void refreshVisualBoardProjection(){
       for(int i=0;i<boardLogic.GetLength(0);i++){
            for(int j=0;j<boardLogic.GetLength(1);j++){
               if(boardLogic[i,j]!=0){
@@ -82,11 +83,20 @@ public class TableBehaviour
    // when the piece reaches its final position
    // we check if any of the rows have been completed
    public void finalizedPiecePlacement(){
+      int[] temporaryArray= new int[4];
+
       refreshLogicPosition(1);
       int rowsfreed=0;
       for (int i =0;i<currentTetrominoPosition.GetLength(0);i++){
-         if(checkRow(currentTetrominoPosition[i,0])){
-            removeRow(currentTetrominoPosition[i,0]);
+         temporaryArray[i]=currentTetrominoPosition[i,0];
+      }
+      
+      Array.Sort(temporaryArray);
+
+      foreach (var item in temporaryArray)
+      {
+          if(checkRow(item)){
+            removeRow(item);
             rowsfreed++;
          }
       }
@@ -110,8 +120,9 @@ public class TableBehaviour
                 return false;
             }
         }
-        return true;
-    }
+      return true;
+   }
+   
    public bool freeSpaceUnderneath(int[,] newPosition){
         for(int i=0;i<newPosition.GetLength(0);i++){
             if((newPosition[i,0]==23 || boardLogic[newPosition[i,0]+1,newPosition[i,1]]==1)){
@@ -120,6 +131,7 @@ public class TableBehaviour
         }
         return true;
     }
+
    void coordinateCopy(int[,] a,int[,] b){
       for(int i=0;i<4;i++){
          for(int j=0;j<2;j++){

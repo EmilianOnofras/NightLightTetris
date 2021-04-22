@@ -8,9 +8,9 @@ using UnityEngine.UI;
 public class gameMasterScript : MonoBehaviour
 {
     public GameObject[] uiBlocks = new GameObject[240];
-    public GameObject[] previewTableOne = new GameObject[16]; 
-    public GameObject[] previewTableTwo = new GameObject[16]; 
-    public GameObject[] previewTableThree = new GameObject[16];  
+    public GameObject[] previewTableOne = new GameObject[16];
+    public GameObject[] previewTableTwo = new GameObject[16];
+    public GameObject[] previewTableThree = new GameObject[16];
     TableBehaviour tableSystem ;
     tetrominoAdministrator tetAdmin;
 
@@ -20,32 +20,52 @@ public class gameMasterScript : MonoBehaviour
     Tetromino currentPiece;
     Dictionary<char,int[][,]> RotationLibrary;
     public Text score;
+    bool delayActivated = false;
 
     public PlayerInput player_Input;
 
     private pointManager pointSystem;
 
+    void Start(){
+        TableBehaviour.newRoundEvent+=generateNewPiece;
+    }
     public void startGame()
     {
         pointSystem = new pointManager(score);
         tableSystem = new TableBehaviour(uiBlocks,pointSystem);
-        previewTable = new tetrominoPreview(previewTableOne,previewTableTwo,previewTableThree);  
+        previewTable = new tetrominoPreview(previewTableOne,previewTableTwo,previewTableThree);
         tetAdmin = new tetrominoAdministrator(previewTable);
-      
+
         RotationLibrary = tetAdmin.getRotationLibrary();
         generateNewPiece();
         tableSystem.refreshPosition(currentPiece.getPieceLocation());
 
-        TableBehaviour.newRoundEvent+=generateNewPiece;
         InvokeRepeating("moveDownAuto",0f,0.85f);
+
+        //here to make sure starting the game after
+        //having played once has the right actionMap and clean board
+        tableSystem.refreshVisualBoardProjection();
+        player_Input.SwitchCurrentActionMap("Player");
     }
 
     public void pauseGame(){
-        player_Input.SwitchCurrentActionMap("UI"); 
+        player_Input.SwitchCurrentActionMap("UI");
         CancelInvoke();
     }
 
     public void resumeGame(){
+        player_Input.SwitchCurrentActionMap("Player");
+        InvokeRepeating("moveDownAuto",0f,0.85f);
+    }
+
+    public void restartGame(){
+        pointSystem = new pointManager(score);
+        tableSystem = new TableBehaviour(uiBlocks,pointSystem);
+        previewTable = new tetrominoPreview(previewTableOne,previewTableTwo,previewTableThree);
+        tetAdmin = new tetrominoAdministrator(previewTable);
+        generateNewPiece();
+
+        tableSystem.refreshVisualBoardProjection();
         player_Input.SwitchCurrentActionMap("Player");
         InvokeRepeating("moveDownAuto",0f,0.85f);
     }
@@ -57,8 +77,7 @@ public class gameMasterScript : MonoBehaviour
         }else{
             ScorePanel.SetActive(true);
             ScorePanel.GetComponent<scoreBoard>().gameIsDone();
-            player_Input.SwitchCurrentActionMap("UI"); 
-            Debug.Log("U did good");
+            player_Input.SwitchCurrentActionMap("UI");
             CancelInvoke();
         }
 
@@ -95,10 +114,10 @@ public class gameMasterScript : MonoBehaviour
                 currentPiece.cancelMove();
             }
 
-            if(!tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())){
-                StartCoroutine(waitBeforeFinalizingPlacement());
+            if(!(tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation()) && !(delayActivated))){
+                waitBeforeFinalizingPlacement();
             }
-        } 
+        }
     }
 
     public void moveDownAuto(){
@@ -109,8 +128,8 @@ public class gameMasterScript : MonoBehaviour
             currentPiece.cancelMove();
         }
 
-        if(!tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())){
-            StartCoroutine(waitBeforeFinalizingPlacement());
+        if(!(tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())) && !delayActivated){
+            waitBeforeFinalizingPlacement();
         }
     }
 
@@ -130,7 +149,28 @@ public class gameMasterScript : MonoBehaviour
             }
 
             if(foundNew==false){
-                currentPiece.cancelMove();  
+                currentPiece.cancelMove();
+            }
+        }
+    }
+
+    public void reverseRotatePiece(InputAction.CallbackContext context){
+        if(context.performed){
+            var possibleRotations = currentPiece.reverseRotatate();
+            bool foundNew = false;
+            int i=0;
+
+            while(!foundNew && i<possibleRotations.GetLength(0)){
+                if(tableSystem.validMove(possibleRotations[i])){
+                    currentPiece.confirmReverseRotation(possibleRotations[i]);
+                    tableSystem.refreshPosition(currentPiece.getPieceLocation());
+                    foundNew=true;
+                }
+                i++;
+            }
+
+            if(foundNew==false){
+                currentPiece.cancelMove();
             }
         }
     }
@@ -143,12 +183,17 @@ public class gameMasterScript : MonoBehaviour
         }
     }
 
-    IEnumerator waitBeforeFinalizingPlacement(){
-        yield return new WaitForSeconds(1.5f);
+    void waitBeforeFinalizingPlacement(){
+        delayActivated = true;
+        Invoke("checkFinalPosition",2f);
+    }
 
-        if(!tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())){                    
+    void checkFinalPosition(){
+        if(!tableSystem.freeSpaceUnderneath(currentPiece.getPieceLocation())){
                 currentPiece.cancelMove();
                 tableSystem.finalizedPiecePlacement();
+
             }
+        delayActivated=false;
     }
 }

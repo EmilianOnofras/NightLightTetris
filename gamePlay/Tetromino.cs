@@ -1,24 +1,25 @@
-﻿public class Tetromino
+﻿using UnityEngine;
+public class Tetromino
 {
     public static readonly  int[,,] superRotation = new int[,,] {{{0,0},{-1,0},{-1,1},{0,-2},{-1,-2}},
                                                 {{0,0},{1,0},{1,-1},{0,2},{1,2}},
                                                 {{0,0},{1,0},{1,1},{0,-2},{1,-2}},
                                                 {{0,0},{-1,0},{-1,-1},{0,2},{-1,2}}};
 
-    // public static readonly int[,,] superReverseRotation = new int[,,] {{{0,0},{1,0},{1,-1},{0,2},{1,2}},
-    //                                                         {{0,0},{-1,0},{-1,1},{0,-2},{-1,-2}},
-    //                                                         {{0,0},{-1,0},{-1,-1},{0,2},{-1,2}},
-    //                                                         {{0,0},{1,0},{1,1},{0,-2},{1,-2}}};
+    public static readonly int[,,] superReverseRotation = new int[,,] {{{0,0},{1,0},{1,-1},{0,2},{1,2}},
+                                                            {{0,0},{-1,0},{-1,1},{0,-2},{-1,-2}},
+                                                            {{0,0},{-1,0},{-1,-1},{0,2},{-1,2}},
+                                                            {{0,0},{1,0},{1,1},{0,-2},{1,-2}}};
 
     public static readonly int[,,] pieceIsuperRotation = new int[,,] {{{0,0},{-2,0},{1,0},{-2,-1},{1,2}},
                                                 {{0,0},{-1,0},{2,0},{-1,2},{2,-1}},
                                                 {{0,0},{2,0},{-1,0},{2,1},{-1,-2}},
                                                 {{0,0},{1,0},{-2,0},{1,-2},{-2,1}}};
 
-    // public static readonly int[,,] pieceIsuperReverseRotation = new int[,,] {{{0,0},{2,0},{-1,0},{2,1},{-1,-2}},
-    //                                                         {{0,0},{1,0},{-2,0},{1,-2},{-2,1}},
-    //                                                         {{0,0},{-2,0},{1,0},{-2,-1},{1,2}},
-    //                                                         {{0,0},{-1,0},{2,0},{-1,2},{2,-1}}};                    
+    public static readonly int[,,] pieceIsuperReverseRotation = new int[,,] {{{0,0},{2,0},{-1,0},{2,1},{-1,-2}},
+                                                            {{0,0},{1,0},{-2,0},{1,-2},{-2,1}},
+                                                            {{0,0},{-2,0},{1,0},{-2,-1},{1,2}},
+                                                            {{0,0},{-1,0},{2,0},{-1,2},{2,-1}}};                    
 
     private int[,] pieceLocation;
     private int[,] nextMove;
@@ -27,6 +28,7 @@
     
     int[][,] rotationTable;
     int nextRotation=0;
+    int previewsRotation=3;
 
     private void horizontalMovement(int direction){
         nextMove[0,1]+=direction;
@@ -63,14 +65,40 @@
 
         if(letterDesignation!='I'){
             for(int i=0;i<rotationOpportunities.GetLength(0);i++){
-                rotationOpportunities[i] = tetrominoAdministrator.tetrominoSubCoordinateXY(nextMove,superRotation[nextRotation,i,0],superRotation[nextRotation,i,0]);
+                rotationOpportunities[i] = tetrominoAdministrator.tetrominoSubCoordinateXY(
+                    nextMove,superRotation[nextRotation,i,0],superRotation[nextRotation,i,0]);
             }
         }else{
             for(int i=0;i<rotationOpportunities.GetLength(0);i++){
-                rotationOpportunities[i] = tetrominoAdministrator.tetrominoSubCoordinateXY(nextMove,pieceIsuperRotation[nextRotation,i,0],pieceIsuperRotation[nextRotation,i,0]);
+                rotationOpportunities[i] = tetrominoAdministrator.tetrominoSubCoordinateXY(
+                    nextMove,pieceIsuperRotation[nextRotation,i,0],pieceIsuperRotation[nextRotation,i,0]);
             }            
         }
 
+
+        return rotationOpportunities; 
+    }
+
+    public int[][,] reverseRotatate(){
+        for(int i=0;i<4;i++){
+            for(int j=0;j<2;j++){
+                nextMove[i,j]-=rotationTable[previewsRotation][i,j];
+               
+            }
+        }
+        int[][,] rotationOpportunities= new int[5][,];
+
+        if(letterDesignation!='I'){
+            for(int i=0;i<rotationOpportunities.GetLength(0);i++){
+                rotationOpportunities[i] = tetrominoAdministrator.tetrominoSubCoordinateXY(
+                    nextMove,superReverseRotation[previewsRotation,i,0],superReverseRotation[previewsRotation,i,0]);
+            }
+        }else{
+            for(int i=0;i<rotationOpportunities.GetLength(0);i++){
+                rotationOpportunities[i] = tetrominoAdministrator.tetrominoSubCoordinateXY(
+                    nextMove,pieceIsuperReverseRotation[previewsRotation,i,0],pieceIsuperRotation[previewsRotation,i,0]);
+            }            
+        }
 
         return rotationOpportunities; 
     }
@@ -85,7 +113,18 @@
         updateLocationState(newRotation,nextMove); 
         updateLocationState(nextMove,pieceLocation);
         nextRotation=(++nextRotation)%4;
+        previewsRotation=(++previewsRotation)%4;
     }
+
+    public void confirmReverseRotation(int[,] newRotation){
+        updateLocationState(newRotation,nextMove); 
+        updateLocationState(nextMove,pieceLocation);
+
+        nextRotation = (nextRotation-1)<0?3:(nextRotation-1);
+        previewsRotation=(previewsRotation-1)<0?3:(previewsRotation-1);
+    }
+
+
     public void cancelMove(){
          updateLocationState(pieceLocation,nextMove);
     }

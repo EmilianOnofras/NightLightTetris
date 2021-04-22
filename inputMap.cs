@@ -57,6 +57,14 @@ public class @InputMap : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""reverseRotation"",
+                    ""type"": ""Button"",
+                    ""id"": ""f73c9a70-9aec-41de-87b1-2e0f87bc5e00"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -112,6 +120,17 @@ public class @InputMap : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""fastDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d7bf3f2-006d-4520-a57b-1ac93c9a2b0a"",
+                    ""path"": ""<Keyboard>/z"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""reverseRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -215,6 +234,7 @@ public class @InputMap : IInputActionCollection, IDisposable
         m_Player_RotateForward = m_Player.FindAction("RotateForward", throwIfNotFound: true);
         m_Player_moveDown = m_Player.FindAction("moveDown", throwIfNotFound: true);
         m_Player_fastDown = m_Player.FindAction("fastDown", throwIfNotFound: true);
+        m_Player_reverseRotation = m_Player.FindAction("reverseRotation", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_doNothing = m_UI.FindAction("doNothing", throwIfNotFound: true);
@@ -272,6 +292,7 @@ public class @InputMap : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_RotateForward;
     private readonly InputAction m_Player_moveDown;
     private readonly InputAction m_Player_fastDown;
+    private readonly InputAction m_Player_reverseRotation;
     public struct PlayerActions
     {
         private @InputMap m_Wrapper;
@@ -281,6 +302,7 @@ public class @InputMap : IInputActionCollection, IDisposable
         public InputAction @RotateForward => m_Wrapper.m_Player_RotateForward;
         public InputAction @moveDown => m_Wrapper.m_Player_moveDown;
         public InputAction @fastDown => m_Wrapper.m_Player_fastDown;
+        public InputAction @reverseRotation => m_Wrapper.m_Player_reverseRotation;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -305,6 +327,9 @@ public class @InputMap : IInputActionCollection, IDisposable
                 @fastDown.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFastDown;
                 @fastDown.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFastDown;
                 @fastDown.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnFastDown;
+                @reverseRotation.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReverseRotation;
+                @reverseRotation.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReverseRotation;
+                @reverseRotation.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnReverseRotation;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -324,6 +349,9 @@ public class @InputMap : IInputActionCollection, IDisposable
                 @fastDown.started += instance.OnFastDown;
                 @fastDown.performed += instance.OnFastDown;
                 @fastDown.canceled += instance.OnFastDown;
+                @reverseRotation.started += instance.OnReverseRotation;
+                @reverseRotation.performed += instance.OnReverseRotation;
+                @reverseRotation.canceled += instance.OnReverseRotation;
             }
         }
     }
@@ -413,6 +441,7 @@ public class @InputMap : IInputActionCollection, IDisposable
         void OnRotateForward(InputAction.CallbackContext context);
         void OnMoveDown(InputAction.CallbackContext context);
         void OnFastDown(InputAction.CallbackContext context);
+        void OnReverseRotation(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
